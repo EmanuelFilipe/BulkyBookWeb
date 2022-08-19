@@ -22,5 +22,25 @@ namespace BulkyBookWeb.Controllers
             IEnumerable<Category> model = _context.Categories.ToList();
             return View(model);
         }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Category model)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Categories.Add(model);
+                _context.SaveChanges();
+
+                return RedirectToAction(nameof(Index));
+            }
+            
+            return View(model);
+        }
     }
 }
