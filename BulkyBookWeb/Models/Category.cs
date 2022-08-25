@@ -14,6 +14,7 @@ namespace BulkyBookWeb.Models
         public string Name { get; set; }
 
         [Display(Name = "Display Order")]
+        //[Range(5,100, ErrorMessage = "{0} must be between {1}1 and {2}!")]
         public int DisplayOrder { get; set; }
 
         public DateTime CreateDateTime { get; set; } = DateTime.Now;
