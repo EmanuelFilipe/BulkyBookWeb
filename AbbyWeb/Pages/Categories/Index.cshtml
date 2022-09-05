@@ -1,4 +1,58 @@
 ﻿@page
 @model AbbyWeb.Pages.Categories.IndexModel
-@{
+
+
+
+<div class="container p-3 border">
+	<div class="row pt-4">
+		<div class="col-6">
+			<h2>Categories List</h2>
+		</div>
+
+		<div class="col-6 text-right mb-3" style="margin-top: 15px;">
+			<a class="btn btn-primary" asp-page="Create">
+				<i class="glyphicon-bishop bi-plus-circle"></i>&nbsp; NEW
+			</a>
+		</div>
+		<hr />
+	</div>
+
+	<table class="table table-bordered table-striped table-dark" style="width: 100%">
+		<thead>
+			<tr>
+				<th width="50%">Name</th>
+				<th width="30%">Display Order</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			@if (Model != null && Model.Categories.Count() > 0)
+			{
+				foreach (var item in Model.Categories)
+				{
+					<tr>
+						<td width="50%">@item.Name</td>
+						<td width="30%">@item.DisplayOrder</td>
+						<td>
+							<div class="w-100 btn-group" role="group">
+								<a type="button" class="btn btn-warning mx-2" asp-page="Edit" asp-route-id="@item.Id" title="Editar"><i class="bi bi-pencil square"></i></a>
+								@*<a id="deleteItem" class="deleteItem btn btn-danger" data-target="#basicModal" data-toggle="modal" data-path="@Url.Action("Delete", "Marca", new { id = item.Id })" title="Deletar"><span class="fa fa-trash" /></a>*@
+								<button class="btn btn-danger mx-2" type="button" id="@item.Id" asp-page-handler="Delete" path="@Url.Action("Delete", "Categories", new { id = item.Id })" onclick="confirmarExclusao(this);"><i class="bi bi-trash-fill"></i></button>
+							</div>
+						</td>
+					</tr>
+				}
+			}
+			else
+			{
+				<tr>
+					<td width="100%" colspan="3" class="text-center"><span>No Data</span></td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
+
+@section Scripts {
+	@{await Html.RenderPartialAsync("_CustomConfirm");}
 }
