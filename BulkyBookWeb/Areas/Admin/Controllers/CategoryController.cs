@@ -1,4 +1,5 @@
 ﻿using BulkyBook.DataAccess;
+using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -6,18 +7,19 @@ using System.Linq;
 
 namespace BulkyBookWeb.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CategoryController(ApplicationDbContext context)
+        public CategoryController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Index()
         {
-            IEnumerable<Category> model = _context.Categories.ToList();
+            IEnumerable<Category> model = _unitOfWork.Category.GetAll();
             return View(model);
         }
 
@@ -32,8 +34,8 @@ namespace BulkyBookWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Categories.Add(model);
-                _context.SaveChanges();
+                _unitOfWork.Category.Add(model);
+                _unitOfWork.Save();
                 TempData["success"] = "Categoria criado com sucesso!";
 
                 return RedirectToAction(nameof(Index));
@@ -45,7 +47,12 @@ namespace BulkyBookWeb.Controllers
         public IActionResult Edit(int id)
         {
             if (id == 0) return NotFound();
-            return View(_context.Categories.Find(id));
+            var category = _unitOfWork.Category.GetFirstOrDefault(c => c.Id == id);
+            //return View(_context.Categories.Find(id));
+
+            if (category == null) return NotFound();
+
+            return View(category);
         }
 
         [HttpPost]
@@ -57,8 +64,8 @@ namespace BulkyBookWeb.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Categories.Update(model);
-                _context.SaveChanges();
+                _unitOfWork.Category.Update(model);
+                _unitOfWork.Save();
                 TempData["success"] = "Categoria Alterada com sucesso!";
 
                 return RedirectToAction(nameof(Index));
@@ -71,7 +78,7 @@ namespace BulkyBookWeb.Controllers
         {
             if (id == 0) return NotFound();
 
-            var categoria = _context.Categories.Find(id);
+            var categoria = _unitOfWork.Category.GetFirstOrDefault(c => c.Id == id);
 
             if (categoria == null) return NotFound();
             
@@ -82,11 +89,11 @@ namespace BulkyBookWeb.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeletePOST(int? id)
         {
-            var categoria = _context.Categories.Find(id);
+            var categoria = _unitOfWork.Category.GetFirstOrDefault(c => c.Id == id);
             if (categoria == null) return NotFound();
 
-            _context.Categories.Remove(categoria);
-            _context.SaveChanges();
+            _unitOfWork.Category.Remove(categoria);
+            _unitOfWork.Save();
             TempData["success"] = "Categoria Apagada com sucesso!";
 
             return RedirectToAction(nameof(Index));
