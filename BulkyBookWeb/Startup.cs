@@ -4,6 +4,7 @@ using BulkyBook.DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,9 +37,8 @@ namespace BulkyBookWeb
                 )
             );
 
-            //services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
-            //    Configuration.GetConnectionString("DefaultConnection")
-            //));
+            services.AddDefaultIdentity<IdentityUser>()
+                    .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddRazorPages().AddRazorRuntimeCompilation();         
@@ -62,9 +62,9 @@ namespace BulkyBookWeb
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
-
+            //app.MapRazorPages();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
